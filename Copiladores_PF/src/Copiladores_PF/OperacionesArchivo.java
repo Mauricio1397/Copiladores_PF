@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
-
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 public class OperacionesArchivo {
 	
@@ -21,17 +23,12 @@ public class OperacionesArchivo {
 		ArrayList<String> lineas = lineasArchivo("operaciones.txt");
 		
 		generaArchivo(lineas);
-		
-	
-		
-		
+		calculo(lineas);
 			 
 
 	}
 	
-	
-	
-	
+
 	public static ArrayList<String> lineasArchivo(String file) throws IOException {
 		ArrayList<String> lineas = new ArrayList<String>();
 		File archivo = new File (file);
@@ -93,7 +90,23 @@ public class OperacionesArchivo {
 		
 	}
 	
+	
 	public static void calculo(ArrayList<String> lineas) {
+		
+        
+		
+		String exp="(2+3)8+2+1";
+		
+		try {
+			
+			
+			Double calculo=new operaciones().evaluarExpresion(exp);
+			System.out.print(calculo);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		}
 		
 		
 	}
