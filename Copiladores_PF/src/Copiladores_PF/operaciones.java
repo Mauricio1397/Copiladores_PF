@@ -5,11 +5,8 @@ import java.util.Stack;
 public class operaciones {
 
 	
-	public static double evaluarExpresion(String expresion) {
+	public  double evaluarExpresion(String expresion,  Stack<Double> operandos, Stack<Character> operadores, int controlP) {
         expresion = expresion.replaceAll("\\s+", ""); // Eliminar espacios en blanco
-
-        Stack<Double> operandos = new Stack<>();
-        Stack<Character> operadores = new Stack<>();
 
         for (int i = 0; i < expresion.length(); i++) {
             char c = expresion.charAt(i);
@@ -28,36 +25,75 @@ public class operaciones {
                 operandos.push(numero);
                 
             } else if (c == '(') {
-                operadores.push(c);
+                Double numero=null;
                 
-                
+                int d=expresion.indexOf(')');
+                if  (d != -1) {
+                    
+                     String parentesis=expresion.substring(i+1, expresion.indexOf(')'));
+                     numero= evaluarExpresion(parentesis, operandos, operadores, controlP+1);
+                     if (controlP!=0) {
+                        controlP--;
+                    }
+                     operandos.push(numero);
+                     if (!operandos.empty()) {
+                         
+                       
+                         char antP=expresion.charAt(i-1);
+                         if(antP!='+'){
+                             if (antP!='-') {
+                                  if (antP=='/' || antP=='*') {
+                                    realizarOperacion(operandos, operadores);
+                                  }else{
+                                    operadores.push('*');
+                                    realizarOperacion(operandos, operadores);
+                                  }
+                           }  
+                         }
+     
+                    }
+                     i=d;
+                 }else {
+                    System.out.println("Error de sintaxis");
+                }
                 
             } else if (c == ')') {
                 while (!operadores.isEmpty() && operadores.peek() != '(') {
                     realizarOperacion(operandos, operadores);
                 }
-                
-                if (!operadores.isEmpty() && operadores.peek() == '(') {
-                    operadores.pop(); // Eliminar el '(' correspondiente
+                if (Character.isDigit(expresion.charAt(i + 1))) {
+                    operadores.push('*');
                 }
-                if (!operadores.isEmpty() && (operadores.peek() == '*' || operadores.peek() == '/')) {
-                    realizarOperacion(operandos, operadores);
-                }
-                
                 
                 
             } else if (esOperador(c)) {
-                while (!operadores.isEmpty() && obtenerPrioridad(c) <= obtenerPrioridad(operadores.peek())) {
-                    realizarOperacion(operandos, operadores);
-                }
                 operadores.push(c);
+                if (c=='*' || c=='/') {
+                    if (expresion.charAt(i + 1) !='(') {
+                        StringBuilder token = new StringBuilder();
+                            while (i + 1 < expresion.length() && (Character.isDigit(expresion.charAt(i + 1)) || expresion.charAt(i + 1) == '.')) {
+                            token.append(expresion.charAt(i + 1));
+                        i++;
+                        }
+                        Double numero=Double.parseDouble(token.toString());
+                        operandos.push(numero);
+                        realizarOperacion(operandos, operadores);
+                    }
+                         
+                }
+
             }
         }
-
-        while (!operadores.isEmpty()) {
+        
+        
+        
+        while (!operadores.isEmpty() && controlP==0) {
             realizarOperacion(operandos, operadores);
         }
-
+        if (!operadores.isEmpty()) {
+          realizarOperacion(operandos, operadores);
+        }
+        
         return operandos.pop();
     }
 
@@ -77,6 +113,7 @@ public class operaciones {
                 resultado = primerOperando - segundoOperando;
                 break;
             case '*':
+            case '(' :   
                 resultado = primerOperando * segundoOperando;
                 break;
             case '/':
@@ -92,7 +129,7 @@ public class operaciones {
     }
 
     public static int obtenerPrioridad(char operador) {
-        if (operador == '*' || operador == '/') {
+        if (operador == '*' || operador == '/' || operador =='(') {
             return 2;
         } else if (operador == '+' || operador == '-') {
             return 1;
@@ -100,6 +137,8 @@ public class operaciones {
             return 0;
         }
     }
+    
+    
+    
+        
 }
-	
-

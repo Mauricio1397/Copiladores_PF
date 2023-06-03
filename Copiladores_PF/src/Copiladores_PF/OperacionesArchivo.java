@@ -3,15 +3,15 @@ package Copiladores_PF;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.FileReader;  
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import java.util.Stack;
+
+
 
 public class OperacionesArchivo {
 	
@@ -22,7 +22,7 @@ public class OperacionesArchivo {
 	
 		ArrayList<String> lineas = lineasArchivo("operaciones.txt");
 		
-		generaArchivo(lineas);
+		//generaArchivo(lineas);
 		calculo(lineas);
 			 
 
@@ -92,17 +92,17 @@ public class OperacionesArchivo {
 	
 	
 	public static void calculo(ArrayList<String> lineas) {
-		
-        
-		
-		String exp="(2+3)8+2+1";
+         Stack<Double> operandos = new Stack<>();
+         Stack<Character> operadores = new Stack<>();
+         int controlP=0;
+		String exp="88+66/96+73/55-49-19";
 		
 		try {
 			
 			
-			Double calculo=new operaciones().evaluarExpresion(exp);
+			Double calculo=new operaciones().evaluarExpresion(exp, operandos, operadores, controlP);
 			System.out.print(calculo);
-			
+	
 		} catch (Exception e) {
 			e.printStackTrace();
 			
