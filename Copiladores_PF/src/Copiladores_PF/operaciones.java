@@ -1,15 +1,21 @@
 package Copiladores_PF;
 
+import java.util.Optional;
 import java.util.Stack;
 
 public class operaciones {
 
 	
-	public  double evaluarExpresion(String expresion,  Stack<Double> operandos, Stack<Character> operadores, int controlP) {
+	public double evaluarExpresion(String expresion,  Stack<Double> operandos, Stack<Character> operadores, int controlP, Stack<Character>Cparent) {
         expresion = expresion.replaceAll("\\s+", ""); // Eliminar espacios en blanco
-
+        if (expresion.endsWith("=")) {
+            expresion = expresion.substring(0, expresion.length() - 1);
+        }
+        
         for (int i = 0; i < expresion.length(); i++) {
+            
             char c = expresion.charAt(i);
+            
 
                 if (Character.isDigit(c) || c == '.') {
                     StringBuilder token = new StringBuilder();
@@ -17,14 +23,17 @@ public class operaciones {
 
                 // Continuar recorriendo para obtener el número completo
                 while (i + 1 < expresion.length() && (Character.isDigit(expresion.charAt(i + 1)) || expresion.charAt(i + 1) == '.')) {
+                    
                 	token.append(expresion.charAt(i + 1));
                     i++;
+                    
                 }
 
                 double numero = Double.parseDouble(token.toString());
                 operandos.push(numero);
                 
             } else if (c == '(') {
+                Cparent.push(c);
                 operadores.push(c);
                 Double numero=null;
                 
@@ -39,12 +48,13 @@ public class operaciones {
                       
                     }
                       
-                     numero= evaluarExpresion(parentesis, operandos, operadores, controlP+1);
+                     numero= evaluarExpresion(parentesis, operandos, operadores, controlP+1, Cparent);
                      if (operadores.peek()=='(') {
                         operadores.pop();
+        
                     }
                      operandos.push(numero);
-                     if (!operandos.empty()) {
+                     if (!operadores.empty() || !operandos.empty()) {   
                          
                        
                          char antP=expresion.charAt(i-1);
@@ -60,13 +70,18 @@ public class operaciones {
                          }
      
                     }
-                     i=d;
+                     i=d-1;
                  }else {
-                    System.out.println("Error de sintaxis");
+                    
+                    return -0.0;
                 }
                 
             } else if (c == ')') {
-                    if (!esOperador(expresion.charAt(i+1))) {
+                
+                    if (Cparent.peek()=='(') {
+                        Cparent.pop();
+                        
+                        if (i!=expresion.length()-1 && !esOperador(expresion.charAt(i+1))) {
                         operadores.push('*');
                         StringBuilder token = new StringBuilder();
                             while (i + 1 < expresion.length() && (Character.isDigit(expresion.charAt(i + 1)) || expresion.charAt(i + 1) == '.')) {
@@ -77,7 +92,16 @@ public class operaciones {
                              operandos.push(numero);
                              realizarOperacion(operandos, operadores);
  
-                    } 
+                        }else if (i==expresion.length()-1 && operadores.peek()=='(') {
+                            Cparent.push('(');
+                        }
+                        
+                        
+                    }else{
+                        return -0.0;
+                    }
+                    
+                     
             } else if (esOperador(c)) {
                 operadores.push(c);
                 if (c=='*' || c=='/') {
@@ -95,7 +119,12 @@ public class operaciones {
                          
                 }
 
+            }else{
+                return -0.0;
             }
+                
+              
+            
         }
         
        
@@ -128,11 +157,13 @@ public class operaciones {
                 while (!operadores.isEmpty() && operadores.peek()!='(') {
                     realizarOperacion(operandos, operadores);
                 }
+                
            }
  
         
-        
+           
             return operandos.pop();
+            
     }
 
 	

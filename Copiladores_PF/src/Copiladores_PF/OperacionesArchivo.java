@@ -17,12 +17,12 @@ public class OperacionesArchivo {
 	
 	
 	public static void main(String[] args) throws IOException {
-
+            System.out.println("HOLA");
 		ArrayList<String> lineas = lineasArchivo("operaciones.txt");
 		
 		//generaArchivo(lineas);
 		calculo(lineas);
-			 
+                
 
 	}
 	
@@ -54,60 +54,81 @@ public class OperacionesArchivo {
 		return lineas;
 	}
 	
-	
-	public static String LeeTokens(String linea){
-		String instruccion="error";
-		try {
-			 instruccion = linea.substring(0,linea.indexOf("("));
-		} catch (Exception e) {
-			
-		}
-		return instruccion;
-	
-		
-	}
-	
-	public static void generaArchivo(ArrayList<String> lineas) {
-		
-		try {
-			FileWriter archivo = new FileWriter("salida.txt");
-			BufferedWriter salida = new BufferedWriter(archivo);
-			
-			for (String OP : lineas) {
-				
-				salida.write(OP+"  Leido");	
-				salida.newLine();
-				
-			}
-			salida.close();
-			
-		} catch (Exception e) {
-			System.out.println("Error al generar el archivo: " + e.getMessage());
-		}
-		
-		
-	}
-	
-	
 	public static void calculo(ArrayList<String> lineas) {
-         Stack<Double> operandos = new Stack<>();
-         Stack<Character> operadores = new Stack<>();
-         int controlP=0;
-		String exp="3+5-6(3*3+3(9/3))+5(3+5+3)";
+            try {
+                
+                
+                
+                
+                int controlP=0;
+                String error=null;
+                String exp=null;
+                Double calculo=null;
+                
+                SalidaArchivo salida = new SalidaArchivo("salida.txt");
+                salida.crearArchivo();
+               for (String linea : lineas) {
+                   //String linea="43(17*25*19(95+86+93*7)58=";
+                   Stack<Character> Cparent = new Stack<>();
+                   Stack<Double> operandos = new Stack<>();
+                   Stack<Character> operadores = new Stack<>();
+                   
+                    
+                    exp=linea;
+                    
+                    try {
+                        calculo=new operaciones().evaluarExpresion(exp, operandos, operadores, controlP, Cparent);
+                        
+                        if (calculo==-0.0 || !Cparent.empty()) {
+                            error="Error de sintaxis";
+                            salida.agregarLinea(linea+" "+error);
+                            
+                        }else{
+                            salida.agregarLinea(exp+" "+calculo);
+                            
+                        }
+                        
+                    } catch (Exception e) {
+                        error="Error de sintaxis";
+                        salida.agregarLinea(exp+" "+error);
+                       
+                    }
+                    
+                    
+                    
+               }
+                System.out.println("\n\n!!!!!! FINALIZADO !!!!!!");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
 		
-		try {
-			
-			
-			Double calculo=new operaciones().evaluarExpresion(exp, operandos, operadores, controlP);
-			System.out.print(calculo);
-	
-		} catch (Exception e) {
-			e.printStackTrace();
-			
-    		}
+		
 		
 		
 	}
+        
+        
+        public static void generaArchivo(String linea) {
+                    try {
+                        File archivo = new File("salida.txt");
+
+
+                        FileWriter archivoWriter = new FileWriter(archivo);
+                        BufferedWriter salida = new BufferedWriter(archivoWriter);
+
+                        salida.write(linea);
+                        salida.newLine();
+
+                        salida.close();
+                        
+
+                    } catch (Exception e) {
+                        System.out.println("Error al generar el archivo: " + e.getMessage());
+                    }
+}
+
+        
+        
 	
 }
 
