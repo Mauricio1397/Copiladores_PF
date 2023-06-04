@@ -17,7 +17,7 @@ public class OperacionesArchivo {
 	
 	
 	public static void main(String[] args) throws IOException {
-            System.out.println("HOLA");
+            
 		ArrayList<String> lineas = lineasArchivo("operaciones.txt");
 		
 		//generaArchivo(lineas);
