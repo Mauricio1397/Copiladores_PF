@@ -11,8 +11,8 @@ public class operaciones {
         for (int i = 0; i < expresion.length(); i++) {
             char c = expresion.charAt(i);
 
-            if (Character.isDigit(c) || c == '.') {
-                StringBuilder token = new StringBuilder();
+                if (Character.isDigit(c) || c == '.') {
+                    StringBuilder token = new StringBuilder();
                 token.append(c);
 
                 // Continuar recorriendo para obtener el número completo
@@ -25,15 +25,23 @@ public class operaciones {
                 operandos.push(numero);
                 
             } else if (c == '(') {
+                operadores.push(c);
                 Double numero=null;
                 
-                int d=expresion.indexOf(')');
+                int d = expresion.indexOf(')', i);
+                
                 if  (d != -1) {
-                    
-                     String parentesis=expresion.substring(i+1, expresion.indexOf(')'));
+                    String parentesis=null;
+                    if (expresion.substring(i+1,d ).indexOf('(') != -1){
+                     parentesis=expresion.substring(i+1, expresion.indexOf(')')+1);
+                    }else{
+                       parentesis=expresion.substring(i+1, d);
+                      
+                    }
+                      
                      numero= evaluarExpresion(parentesis, operandos, operadores, controlP+1);
-                     if (controlP!=0) {
-                        controlP--;
+                     if (operadores.peek()=='(') {
+                        operadores.pop();
                     }
                      operandos.push(numero);
                      if (!operandos.empty()) {
@@ -58,14 +66,18 @@ public class operaciones {
                 }
                 
             } else if (c == ')') {
-                while (!operadores.isEmpty() && operadores.peek() != '(') {
-                    realizarOperacion(operandos, operadores);
-                }
-                if (Character.isDigit(expresion.charAt(i + 1))) {
-                    operadores.push('*');
-                }
-                
-                
+                    if (!esOperador(expresion.charAt(i+1))) {
+                        operadores.push('*');
+                        StringBuilder token = new StringBuilder();
+                            while (i + 1 < expresion.length() && (Character.isDigit(expresion.charAt(i + 1)) || expresion.charAt(i + 1) == '.')) {
+                            token.append(expresion.charAt(i + 1));
+                        i++;
+                        }
+                            Double numero=Double.parseDouble(token.toString());
+                             operandos.push(numero);
+                             realizarOperacion(operandos, operadores);
+ 
+                    } 
             } else if (esOperador(c)) {
                 operadores.push(c);
                 if (c=='*' || c=='/') {
@@ -75,9 +87,10 @@ public class operaciones {
                             token.append(expresion.charAt(i + 1));
                         i++;
                         }
-                        Double numero=Double.parseDouble(token.toString());
-                        operandos.push(numero);
-                        realizarOperacion(operandos, operadores);
+                            Double numero=Double.parseDouble(token.toString());
+                             operandos.push(numero);
+                             realizarOperacion(operandos, operadores);
+   
                     }
                          
                 }
@@ -85,16 +98,41 @@ public class operaciones {
             }
         }
         
+       
+            if (!operadores.isEmpty() && controlP==0 && operadores.peek()!='/') {
+                Stack<Double> operandossum = new Stack<>();
+                Stack<Character> operadoressum = new Stack<>();
+            
+                
+                while (!operandos.isEmpty()) {
+                    Double elemento = operandos.pop();
+                    operandossum.push(elemento);
+                }
+                while (!operadores.isEmpty()) {
+                    char elemento = operadores.pop();
+                    operadoressum.push(elemento);
+                }
+            operadores=operadoressum;
+            operandos=operandossum;
+            
+            while (!operadores.isEmpty() && controlP==0) {
+            
+                realizarOperacion(operandos, operadores);
+            
+                }
+            
+           }else{
+                while (!operadores.isEmpty() && (operadores.peek()!='+') && operadores.peek()!='-' && operadores.peek()!='(' ) {
+                realizarOperacion(operandos, operadores);
+                }
+                while (!operadores.isEmpty() && operadores.peek()!='(') {
+                    realizarOperacion(operandos, operadores);
+                }
+           }
+ 
         
         
-        while (!operadores.isEmpty() && controlP==0) {
-            realizarOperacion(operandos, operadores);
-        }
-        if (!operadores.isEmpty()) {
-          realizarOperacion(operandos, operadores);
-        }
-        
-        return operandos.pop();
+            return operandos.pop();
     }
 
 	
@@ -103,14 +141,14 @@ public class operaciones {
         double segundoOperando = operandos.pop();
         double primerOperando = operandos.pop();
 
-        double resultado = 0.0;
+            double resultado = 0.0;
 
         switch (operador) {
             case '+':
-                resultado = primerOperando + segundoOperando;
+                resultado = segundoOperando + primerOperando;
                 break;
             case '-':
-                resultado = primerOperando - segundoOperando;
+                resultado = segundoOperando - primerOperando;
                 break;
             case '*':
             case '(' :   

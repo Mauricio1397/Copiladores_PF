@@ -17,9 +17,7 @@ public class OperacionesArchivo {
 	
 	
 	public static void main(String[] args) throws IOException {
-		
 
-	
 		ArrayList<String> lineas = lineasArchivo("operaciones.txt");
 		
 		//generaArchivo(lineas);
@@ -95,7 +93,7 @@ public class OperacionesArchivo {
          Stack<Double> operandos = new Stack<>();
          Stack<Character> operadores = new Stack<>();
          int controlP=0;
-		String exp="88+66/96+73/55-49-19";
+		String exp="3+5-6(3*3+3(9/3))+5(3+5+3)";
 		
 		try {
 			
@@ -106,7 +104,7 @@ public class OperacionesArchivo {
 		} catch (Exception e) {
 			e.printStackTrace();
 			
-		}
+    		}
 		
 		
 	}
